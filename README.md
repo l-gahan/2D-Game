@@ -12,7 +12,7 @@ Image and sound credits:
 Background image is my own.
 Coin Sprites created by Salgueiroazul (https://salgueiroazul.itch.io) on itch.io.
 Enemy Sprites created by Gif (https://gif-superretroworld.itch.io) on itch.io.
-The enemy sprites creators twitter creators Twitters are:
+The enemy sprites creators Twitters are:
         Gif (@gif_not_jif)
         Noiracide (@Noiracide)
         Romi (@DessRomaric)
