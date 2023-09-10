@@ -11,17 +11,21 @@ let xhttp;
 let IMAGES = {
     coin: "static/coin.png",
     playerImage: "static/character.png",
-    enemyImage: "static/enemy.png"
+    enemyImage: "static/enemy.png",
+    background: "static/background.png"
 }
 
 // 
+// Enemies and player health
+let playHitSound = document.querySelector("#playHitSound");
 let enemies = [];
-let delay = 0; //slow coin rotation
-let coinsCollected = 0;
-let score = 0;
 let health = 3;
+// 
+// Used to display announcements on screen
 let score_display = document.querySelector("#score");
 let game_over_screen = document.querySelector("#game_over");
+// 
+
 // Cursor
 let cursor = {
     x: -1,
@@ -48,12 +52,16 @@ let upImageCounter= 0;
 let downImageCounter= 0;
 // 
 
-// Coin
+// Coin and score
+let delay = 0; //slow coin rotation
+let coinsCollected = 0;
+let score = 0;
+let playCoinSound = document.querySelector("#playCoinSound");
 let coin = {
     x: 100,
     y: 100,
     size: 25,
-    imgSize: 16,
+    imgSize: 18,
     frameX: 0,
     frameY: 0
 
@@ -97,8 +105,9 @@ function draw() {
 
     // Draw Background
     context.fillStyle = "darkblue";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    // 
+    context.drawImage(
+        IMAGES.background,
+        0, 0, 1000, 700, 0, 0, 1000, 700);
 
     // Draw player
     context.fillStyle = "white";
@@ -118,19 +127,16 @@ function draw() {
 
     // spins coin
     if (delay === 5) {
-        coin.frameX = coin.frameX + 16
-        if (coin.frameX === 48) {
-            coin.frameY = coin.frameY + 16
+        coin.frameX = coin.frameX + 18
+        if (coin.frameX === 126) {
             coin.frameX = 0;
-        }
-        if (coin.frameY === 32) {
-            coin.frameY = 0;
         }
         delay = 0;
     }
     delay = delay + 1;
 
     // 
+
     // Moves Character to follow the mouse
     if (player.y - player.size >= 0) {
         if (moveUp) {
@@ -228,7 +234,7 @@ function draw() {
 
         }
     }
-    
+    // 
 
     // Draw enemies
     context.fillStyle = "red";
@@ -292,22 +298,39 @@ function draw() {
 
     // If the player hits the coin
     if (hit(coin)) {
+        // play coin sound
+        playCoinSound.play();
+        // 
+
         coinsCollected = coinsCollected + 1;
         // move coin to new location
         coin.x = Math.random() * 900;
         coin.y = Math.random() * 500;
+        // 
+
         // spawn a new enemy
         spawnEnemy();
+        // 
+        // increase score
         score = score + 1;
+        // 
+        // update score display
         score_display.innerHTML = "Score: " + score;
+        // 
     }
     // 
 
     // If player hits an enemy clear screen of enemies and update background color to indicate health
     for (let enemy of enemies) {
         if (hit(enemy)) {
+            // play hit sound
+            playHitSound.play();
+            // 
+
             // decrease health
             health = health - 1;
+            // 
+
             enemies = [];
             player.x = 500;
             player.y = 350;
@@ -321,8 +344,8 @@ function draw() {
             // If player has no remaining health end the game
             if (health === 0) {
                 document.body.style.background = "green";
-                game_over_screen.innerHTML = "Game over";
-                stop();
+                game_over_screen.innerHTML = "Game over -Well Done!- Reload to try again!";
+                gameOver();
             }
             // 
         }
@@ -356,7 +379,9 @@ function movePlayer(event) {
         moveUp = true;
     };
 };
+// 
 
+// function to detect player colliding with objects
 function hit(object) {
     if (player.x > object.x && player.x < object.x + object.size && player.y > object.y && player.y < object.y + object.size) {
         return true;
@@ -364,7 +389,9 @@ function hit(object) {
         return false;
     }
 }
+// 
 
+// function to spawn enemies in random locations
 function spawnEnemy() {
     let enemyX, enemyY;
     if (player.x > 500 && player.y > 350) {
@@ -399,9 +426,8 @@ function spawnEnemy() {
         //
     }
     enemies.push(enemy);
-
-
 }
+// 
 
 // Enemy animation/updates enemies sprite
 function eLeftAnimation(enemy){
@@ -463,7 +489,7 @@ function eUpAnimation(enemy){
 
 
 // Stops the game when called
-function stop() {
+function gameOver() {
     // hide the canvas
     canvas.width = 0;
     canvas.height = 0;
